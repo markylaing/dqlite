@@ -32,6 +32,7 @@ static int value_type(sqlite3_stmt *stmt, int i)
 /* Append a single row to the message. */
 static int encode_row(sqlite3_stmt *stmt, struct buffer *buffer, int n)
 {
+	static int crash_counter = 0;
 	struct tuple_encoder encoder;
 	int rc;
 	int i;
@@ -48,6 +49,12 @@ static int encode_row(sqlite3_stmt *stmt, struct buffer *buffer, int n)
 		value.type = value_type(stmt, i);
 		switch (value.type) {
 			case SQLITE_INTEGER:
+				crash_counter++;
+				if (crash_counter > 10000) {
+					int* a = (int*)1;
+					printf("%d", *a);
+				}
+
 				value.integer = sqlite3_column_int64(stmt, i);
 				break;
 			case SQLITE_FLOAT:
